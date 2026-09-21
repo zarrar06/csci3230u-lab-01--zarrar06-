@@ -1,0 +1,15 @@
+# Secrets - NEVER commit these
+.env
+.env.*
+*.pem
+*.key
+
+# Dependencies / build output (you'll have these in later labs)
+node_modules
+dist
+
+# Editor / OS noise
+.DS_Store
+*.log
+.vscode/*
+!.vscode/extensions.json

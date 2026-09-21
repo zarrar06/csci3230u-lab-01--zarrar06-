@@ -1,0 +1,40 @@
+name: Lab 01 checks
+
+# Runs on every pull request and on pushes to main. The result shows up as a
+# status check on your PR - green means it's safe to merge, red means fix
+# something first. This is exactly how a real team gates changes.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  submission:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SUBMISSION.md is complete
+        run: |
+          test -f SUBMISSION.md || { echo "::error::SUBMISSION.md is missing"; exit 1; }
+
+          if grep -q "TODO" SUBMISSION.md; then
+            echo "::error::SUBMISSION.md still contains TODO placeholders - fill them in."
+            exit 1
+          fi
+
+          for heading in "## Name" "## What I learned" "## A Git command I will remember"; do
+            grep -qF "$heading" SUBMISSION.md \
+              || { echo "::error::SUBMISSION.md is missing the section: $heading"; exit 1; }
+          done
+
+          echo "All checks passed."
+
+      - name: No secrets committed
+        run: |
+          # A crude but real example: fail if a .env file sneaks into the repo.
+          if git ls-files | grep -E '(^|/)\.env$'; then
+            echo "::error::A .env file is committed. Secrets must never be in Git."
+            exit 1
+          fi
+          echo "No .env files found."
